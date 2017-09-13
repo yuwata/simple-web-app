@@ -18,13 +18,14 @@ sudo usermod -aG docker $USER
 docker build --rm -t app-hello .
 ```
 If we get an error like "Could not resolve host: github.com", then
-try to restart docker.service.
+try to restart docker.service. This may be related to the bug listed in BUG.md.
 
 * Start
 ```
-docker run --rm -ti -p 8080:8080 --net=host --name hoge app-hello
+docker run --rm -ti -p 8080:8080 --name hoge app-hello
 ```
-Why '--net=host' is necessary??
+If we cannot connect localhost:8080, then try to use `--network host` option
+or restart docker.service. See BUG.md for detail.
 
 #TODO
 - with firewalld
