@@ -31,3 +31,9 @@ or restart docker.service. See BUG.md for detail.
 
 # TODO
 - with firewalld
+
+# OPTIONAL
+```
+docker run --rm --name foo -e POSTGRES_PASSWORD=foo -d --network host postgres
+docker run --rm -ti -p 8080:8080 --name bar -e DB_URL="host=localhost user=postgres password=foo sslmode=disable" --network host users
+```
