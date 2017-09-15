@@ -11,11 +11,11 @@ If `PORT` env is not set, the application is served on `:8080`.
 
 * Build container
 ```
-$ docker build -t app-hello .
+$ docker build -t hello .
 ```
 * Start container
 ```
-$ docker run -p 8080:8080 --name hoge app-hello
+$ docker run -p 8080:8080 --name hoge hello
 ```
 * Connect container
 ```
@@ -30,3 +30,10 @@ I use [Heroku](https://www.heroku.com/) for publishing the app. The URL is https
 $ curl -XGET -H 'Content-Type:application/json' https://vast-hamlet-24650.herokuapp.com/
 {"message":"Hello World!!"}
 ```
+
+# Ex.3 Create a RESTful application
+
+WRITE ABOUT DOCKER-COMPOSE.
+
+Also, the application is running on Heroku with `heroku-postgresql` addon.
+The URL is https://vast-hamlet-24650.herokuapp.com/.

@@ -21,7 +21,9 @@ web: hello
 ```
 curl -XGET -H 'Content-Type:application/json' https://vast-hamlet-24650.herokuapp.com/
 ```
+* add PostgreSQL support with `heroku addons:create heroku-postgresql:hobby-dev`
 
 # Tips
 * If PATH env is not correctly set, then `gb` command cannot find `gb-vendor`. Thus, you cannot run `gb vendor` command.
 * heroku set PORT env and the port is mapped to :80. So, in the application, you should use PORT env as the service port (gin automatically uses PORT env).
+* `heroku-postgresql` adds `DATABSE_URL` env variable. So, you should use it on apps.
