@@ -45,9 +45,9 @@ func main() {
 
 func init_db() *gorm.DB {
 	// get database url from env
-	url := os.Getenv("DB_URL")
+	url := os.Getenv("DATABASE_URL")
 	if url == "" {
-		panic("Environment variable 'DB_URL' not defined.")
+		panic("Environment variable 'DATABASE_URL' not defined.")
 	}
 
 	// connect to postgres
@@ -58,11 +58,11 @@ func init_db() *gorm.DB {
 
 	// get max connections from env
 	max := defaultMaxConns
-	env := os.Getenv("DB_MAX_CONNS")
+	env := os.Getenv("DATABASE_MAX_CONNS")
 	if env != "" {
 		tmp, err := strconv.Atoi(env)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Invalid 'DB_MAX_CONNS'. Ignored.")
+			fmt.Fprintln(os.Stderr, "Invalid 'DATABASE_MAX_CONNS'. Ignored.")
 		} else {
 			max = tmp
 		}
