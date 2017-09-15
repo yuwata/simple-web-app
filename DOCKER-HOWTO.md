@@ -1,7 +1,33 @@
 # Preparation
+* systemd-networkd
+
+The default settings of systemd-networkd conflicts docker.
+So, create the following files:
+```
+$ cat /etc/systemd/network/00-docker0.network
+[Match]
+Name=docker0
+Driver=bridge
+
+[Network]
+IPForward=kernel
+IPMasquerade=yes
+$ cat /etc/systemd/network/00-docker-veth.link
+[Match]
+Driver=veth
+
+[Link]
+MACAddressPolicy=random
+$ cat /etc/systemd/network/00-docker-veth.network
+[Match]
+Driver=veth
+
+[Network]
+DHCP=no
+```
 * DNS
 
-If the host system uses systemd-resolved and cannot access google DNS servers,
+If the host system cannot access google DNS servers,
 then you should edit /etc/sysconfig/docker-network like
 ```
 # /etc/sysconfig/docker-network
@@ -16,27 +42,23 @@ sudo usermod -aG docker $USER
 ```
 You need to close the session to update the user info.
 
+* TODO
+- with firewalld?
+
 # Build container
 ```
 docker build --rm -t hello -f docker/hello/Dockerfile .
 ```
-If we get an error like "Could not resolve host: github.com", then
-try to restart docker.service. This may be related to the bug listed in BUG.md.
 
 # Start
 ```
 docker run --rm -ti -p 8080:8080 --name hoge hello
 ```
-If we cannot connect localhost:8080, then try to use `--network host` option
-or restart docker.service. See BUG.md for detail.
 
-# OPTIONAL
+# Link to other containers
 ```
 docker pull postgres:latest
 docker build --rm -t restful -f docker/restful/Dockerfile .
-docker run --rm --name foo -e POSTGRES_PASSWORD=foo -d --network host postgres
-docker run --rm -ti -p 8080:8080 --name bar -e DATABASE_URL="host=localhost user=postgres password=foo sslmode=disable" --network host restful
+docker run --rm --name db -e POSTGRES_PASSWORD=foo -d postgres
+docker run --rm -ti -p 8080:8080 --name foo -e DATABASE_URL="host=db user=postgres password=foo sslmode=disable" --link db:db restful
 ```
-
-# TODO
-- with firewalld?
