@@ -1,1 +1,1 @@
-web: users-db-test
+web: restful

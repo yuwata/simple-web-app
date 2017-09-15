@@ -11,7 +11,7 @@ If `PORT` env is not set, the application is served on `:8080`.
 
 * Build container
 ```
-$ docker build -t hello .
+$ docker build -t hello -f docker/hello/Dockerfile .
 ```
 * Start container
 ```
@@ -33,7 +33,10 @@ $ curl -XGET -H 'Content-Type:application/json' https://vast-hamlet-24650.heroku
 
 # Ex.3 Create a RESTful application
 
-WRITE ABOUT DOCKER-COMPOSE.
+* Build container
+```
+$ docker build -t restful -f docker/restful/Dockerfile .
+```
 
 Also, the application is running on Heroku with `heroku-postgresql` addon.
 The URL is https://vast-hamlet-24650.herokuapp.com/.

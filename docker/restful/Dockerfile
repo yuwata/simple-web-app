@@ -1,8 +1,8 @@
 FROM golang:latest
 
-RUN mkdir -p /go/src/users
-WORKDIR /go/src/users
-COPY src/users /go/src/users
+RUN mkdir -p /go/src/restful
+WORKDIR /go/src/restful
+COPY src/restful /go/src/restful
 
 RUN go-wrapper download
 RUN go-wrapper install
