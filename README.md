@@ -33,10 +33,22 @@ $ curl -XGET -H 'Content-Type:application/json' https://vast-hamlet-24650.heroku
 
 # Ex.3 Create a RESTful application
 
-* Build container
+* With docker-compose
 ```
+$ docker-compose up
+```
+
+* Without docker-compose
+
+If you want to test the app without `docker-compose`, then
+```
+$ docker pull postgres:latest
 $ docker build -t restful -f docker/restful/Dockerfile .
+$ docker run --rm --name db -e POSTGRES_PASSWORD=foo -d postgres
+$ docker run --rm -ti -p 8080:8080 --name foo -e DATABASE_URL="host=db user=postgres password=foo sslmode=disable" --link db:db restful
 ```
+
+* Heroku
 
 Also, the application is running on Heroku with `heroku-postgresql` addon.
 The URL is https://vast-hamlet-24650.herokuapp.com/.
