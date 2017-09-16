@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 )
 
 const defaultMaxConns = 20
@@ -31,7 +32,7 @@ type UserPost struct {
 func main() {
 	r := gin.Default()
 
-	db = init_db()
+	init_db()
 
 	r.GET("/", hello_world)
 	r.GET("/users", list_users)
@@ -43,7 +44,7 @@ func main() {
 	r.Run() // listen and serve on 0.0.0.0:8080
 }
 
-func init_db() *gorm.DB {
+func init_db() {
 	// get database url from env
 	url := os.Getenv("DATABASE_URL")
 	if url == "" {
@@ -51,9 +52,17 @@ func init_db() *gorm.DB {
 	}
 
 	// connect to postgres
-	db, err := gorm.Open("postgres", url)
-	if err != nil {
-		panic(err)
+	var err error
+	for trial := 0; ; trial++ {
+		db, err = gorm.Open("postgres", url)
+		if err == nil {
+			break
+		}
+		fmt.Fprintf(os.Stderr, "Failed to connect database: %s.\n", err)
+		if trial >= 5 {
+			panic("")
+		}
+		time.Sleep(3 * time.Second)
 	}
 
 	// get max connections from env
@@ -76,8 +85,6 @@ func init_db() *gorm.DB {
 	if err := db.AutoMigrate(&User{}).Error; err != nil {
 		panic(err)
 	}
-
-	return db
 }
 
 func hello_world(c *gin.Context) {
@@ -86,10 +93,15 @@ func hello_world(c *gin.Context) {
 	})
 }
 
+func on_error(c *gin.Context, err error, code int) {
+	c.String(code, http.StatusText(code))
+	c.AbortWithError(code, err)
+}
+
 func list_users(c *gin.Context) {
 	var user []User
 	if err := db.Find(&user).Error; err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		on_error(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -101,7 +113,7 @@ func show_user(c *gin.Context) {
 
 	var user User
 	if err := db.First(&user, id).Error; err != nil {
-		c.AbortWithError(http.StatusNotFound, err)
+		on_error(c, err, http.StatusNotFound)
 		return
 	}
 
@@ -111,7 +123,7 @@ func show_user(c *gin.Context) {
 func add_user(c *gin.Context) {
 	var json UserPost
 	if err := c.BindJSON(&json); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		on_error(c, err, http.StatusBadRequest)
 		return
 	}
 
@@ -120,7 +132,7 @@ func add_user(c *gin.Context) {
 		Mail: json.Mail,
 	}
 	if err := db.Create(&user).Error; err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		on_error(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -133,14 +145,14 @@ func mod_user(c *gin.Context) {
 	// get current entry
 	var user User
 	if err := db.First(&user, id).Error; err != nil {
-		c.AbortWithError(http.StatusNotFound, err)
+		on_error(c, err, http.StatusNotFound)
 		return
 	}
 
 	// get new info
 	var json UserPost
 	if err := c.BindJSON(&json); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		on_error(c, err, http.StatusBadRequest)
 		return
 	}
 
@@ -148,7 +160,7 @@ func mod_user(c *gin.Context) {
 	user.Name = json.Name
 	user.Mail = json.Mail
 	if err := db.Save(&user).Error; err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		on_error(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -160,12 +172,12 @@ func del_user(c *gin.Context) {
 
 	var user User
 	if err := db.First(&user, id).Error; err != nil {
-		c.AbortWithError(http.StatusNotFound, err)
+		on_error(c, err, http.StatusNotFound)
 		return
 	}
 
 	if err := db.Delete(&user).Error; err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		on_error(c, err, http.StatusInternalServerError)
 		return
 	}
 
