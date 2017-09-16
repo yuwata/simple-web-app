@@ -4,14 +4,12 @@
 The default settings of systemd-networkd conflicts docker.
 So, create the following files:
 ```
-$ cat /etc/systemd/network/00-docker0.network
+$ cat /etc/systemd/network/00-docker-bridge.network
 [Match]
-Name=docker0
 Driver=bridge
 
-[Network]
-IPForward=kernel
-IPMasquerade=yes
+[Link]
+Unmanaged=yes
 $ cat /etc/systemd/network/00-docker-veth.link
 [Match]
 Driver=veth
@@ -24,6 +22,7 @@ Driver=veth
 
 [Network]
 DHCP=no
+IPv6AcceptRA=no
 ```
 * DNS
 
