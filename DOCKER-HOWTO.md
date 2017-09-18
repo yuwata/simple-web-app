@@ -39,7 +39,8 @@ Create group `docker` and add users to the group.
 sudo groupadd -r docker
 sudo usermod -aG docker $USER
 ```
-You need to close the session to update the user info.
+You may need to close the session to update the user info,
+and docker.service may need to be restarted.
 
 * TODO
 - with firewalld?
