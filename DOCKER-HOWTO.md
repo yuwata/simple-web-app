@@ -36,7 +36,7 @@ DOCKER_NETWORK_OPTIONS=--dns 10.224.254.1
 
 Create group `docker` and add users to the group.
 ```
-sudo groupadd docker
+sudo groupadd -r docker
 sudo usermod -aG docker $USER
 ```
 You need to close the session to update the user info.
